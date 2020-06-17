@@ -11,17 +11,13 @@ FPS = 20  # Frames per second
 class MySprite(pygame.sprite.Sprite):
     def __init__(self, action):
         super(MySprite, self).__init__()
-        if type(action) == str:
-            print(type(action))
-            im = glob.glob(action)
-            lenim = len(im[0])
-            self.images = [pygame.image.load(img)
-                           for img in im if len(img) == lenim]
-            self.images2 = [pygame.image.load(img)
-                            for img in im if len(img) > lenim]
-            self.images.extend(self.images2)
-        else:
-            self.images = action
+        im = glob.glob(action)
+        lenim = len(im[0])
+        self.images = [pygame.image.load(img)
+                       for img in im if len(img) == lenim]
+        self.images2 = [pygame.image.load(img)
+                        for img in im if len(img) > lenim]
+        self.images.extend(self.images2)
         self.index = 0
         self.rect = pygame.Rect(40, 40, 800, 600)
 

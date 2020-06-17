@@ -1,6 +1,7 @@
 # Class Director implementa la clase abstracta
 from Logic.Knight import *
 from Game import *
+from Logic.Adapter import *
 from Personaje_master.constuctores import *
 
 
@@ -15,7 +16,10 @@ class Director():
 
     def getknight(self, num):
         sprite = self.__builder.get_sprites()
-        knight = MySprite(sprite[num])
+        if type(self.__builder) != ConstructorZM:
+            knight = MySprite(sprite[num])
+        else:
+            knight = MySpriteAdapter(sprite[num])
         return knight
 
 
