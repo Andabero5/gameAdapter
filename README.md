@@ -22,9 +22,15 @@
     - [**ABSTRACT FACTORY**](#abstract-factory)
       - [**ACTIONS**](#actions)
       - [**GAME**](#game)
-      
-
-      
+  - [**ADAPTER**](#adapter)
+  - [**ZOMBIE**](#zombie)
+    - [**EXPLICACIÓN CÓDIGO ZOMBIE**](#explicación-código-zombie)
+      - [**CONSTRUCTORES**](#constructores)
+      - [**PLAYER**](#player)
+      - [**FABRICAS**](#fabricas)
+      - [**PRODUCTOS**](#productos)
+      - [**RECURSOS**](#recursos)
+      - [**MAIN**](#main)
 
 ## **INTEGRANTES**
 
@@ -38,7 +44,6 @@
 
 ![UML](UML.jpg)
 
-  
 ## **¿CÓMO EJECUTAR?**
 
 Para que este código funcione se debe tener instalado en el sistema Python 3.7+, y el modulo Pygame, si usted dispone de esto, podrá disfutar de una linda serenata interpretada por nuestros músicos del programa, de lo contrario siga las siguientes indicaciones:
@@ -126,33 +131,37 @@ py -m pygame.examples.aliens
 
 Siga los pasos de acuerdo a su distribución:
 
- - **Debian/Ubuntu/Mint**
+- **Debian/Ubuntu/Mint**
 
 ```
 sudo apt-get install python3-pygame
 python3 -m pygame.examples.aliens
 ```
 
- - **Fedora/Red hat**
+- **Fedora/Red hat**
 
 ```
 sudo yum install python3-pygame
 python3 -m pygame.examples.aliens
 ```
- - **Arch/Manjaro**
+
+- **Arch/Manjaro**
 
 ```
 sudo pamac install python-pygame
 python -m pygame.examples.aliens
 ```
+
 #### **PARA MacOS**
 
- - **MacOS X o Posterior**
+- **MacOS X o Posterior**
+
 ```
 python3 -m pip install -U pygame==2.0.0.dev6 --user
 python3 -m pygame.examples.aliens
 ```
- - **Versiones anteriores a MacOS X**
+
+- **Versiones anteriores a MacOS X**
 
 ```
 python -m pip install pygame
@@ -174,7 +183,7 @@ Una clase abstracta, conocida como "Builder", en este programa le hemos bautizad
 ```python
 class Knight():
     '''
-    clase abstracta que define las acciones 
+    clase abstracta que define las acciones
     '''
 
     def iddle(self):
@@ -251,6 +260,7 @@ class GoldenKnight(Knight):
 
 
 ```
+
 También se encuentra una clase Director, cuyo funcionamiento es el de construir un objeto utilizando el patron descrito en esta sección. Para esto hace uso de los diferentes constructores.
 
 #### **DIRECTOR**
@@ -298,6 +308,7 @@ class ConstructorBK():
                ]
 
 ```
+
 ```python
 class ConstructorGK():
     '''
@@ -313,12 +324,12 @@ class ConstructorGK():
                self.factory.createJumpAction()]
 
 ```
+
 ### **ABSTRACT FACTORY**
 
 Este patrón es empleado principalmente para solucionar la creación de diferentes tipos de producto, en nuestro ejemplo, hemos tratado como tipos de productos, el color de nuestro caballero (como distinción), y hemos utilizado las diferentes clases, se mostrará donde se emplea las clases necesarias para la implementación de este patrón. Cabe resaltar que algunas partes se han colocado en código expuesto anteriormente, esto con el fin de simplificar y dar resultados con mayor eficacia.
 
 Abstract Factory requiere el uso de de la interface de las factorías, en la que se debe proveer un método en el que se debe pueda obtener un objeto a crear, en nuestro código le hemos nombrado a esta como "ACTIONS"
-
 
 #### **ACTIONS**
 
@@ -326,7 +337,7 @@ Abstract Factory requiere el uso de de la interface de las factorías, en la que
 # ABSTRACT FACTORY
 class Actions():
     '''
-    clase abstracta que crea las acciones 
+    clase abstracta que crea las acciones
     '''
 
     def createJumpAction(self): pass
@@ -361,6 +372,7 @@ class GKFactory(Actions):
         return "GKImages/jump*.png"
 
 ```
+
 ```python
 # BLACK KNIGHT FACTORY
 class BKFactory(Actions):
@@ -382,8 +394,7 @@ class BKFactory(Actions):
 
 ```
 
-En la clase Game se lleva a cabo el llamado a las factorías con el objetivo de crear cada uno de los objetos requeridos. 
-Esta clase es conocida en los patrones empleados, como la clase "Cliente", esta clase lo que hace es obtener una instancia de alguno de los productos que proporciona las factorías creadas.
+La clase Adapter permite que nuestro programa acepte otros códigos similares, de forma que esta clase adapta el código con los parámetros establecidos para el funcionamiento del nuestro. Como ejemplo se ha utilizado el programa que muestra a un [Zombie](#Zombie) .
 
 #### **GAME**
 
@@ -420,12 +431,12 @@ class MySprite(pygame.sprite.Sprite):
 
 def create_sprites():
     while True:
-        
+
         opc = int(input(
             "Seleccione el guerrero a su preferencia\n1. para el caballero negro\n2. para el caballero dorado\n"))
         director = Director
         if opc == 1: #CABALLERO NEGRO
-          
+
             director.setBuilder(director, ConstructorBK())
             iddle = pygame.sprite.Group(director().getknight(0))
             walk = pygame.sprite.Group(director().getknight(1))
@@ -442,6 +453,7 @@ def create_sprites():
     return iddle, walk, jump
 
 ```
+
 El método main nos crea el programa (empleando el módulo Pygame), establece los parametros del frame, recibe los eventos del teclado y actualiza la pantalla.
 
 ```python
@@ -472,11 +484,273 @@ def main():
     pygame.quit()
 
 ```
+
 Este breve fragmento de código lo que realiza es que apenas el programa sea ejecutado, se proceda a el método main().
 
 ```python
 if __name__ == '__main__':
     main()
+```
+
+### **ADAPTER**
+
+```python
+import pygame
+
+class MySpriteAdapter(pygame.sprite.Sprite):
+
+    def __init__(self, action):
+        super(MySpriteAdapter, self).__init__()
+        self.images = action
+        self.index = 0
+        self.rect = pygame.Rect(40, 40, 800, 600)
+
+    def update(self):
+        if self.index >= len(self.images):
+            self.index = 0
+        self.image = self.images[self.index]
+        self.index += 1
+
+```
+
+En la clase Game se lleva a cabo el llamado a las factorías con el objetivo de crear cada uno de los objetos requeridos.
+Esta clase es conocida en los patrones empleados, como la clase "Cliente", esta clase lo que hace es obtener una instancia de alguno de los productos que proporciona las factorías creadas.
+
+## **ZOMBIE**
+
+- [**MOVIMIENTO PERSONAJES** (KNIGHT) ](#movimiento-personajes)
+  - [**EXPLICACIÓN CÓDIGO**](#explicación-código-Zombie)
+    - [**BUILDER**](#constructores)
+      - [**ZOMBIE**](#player)
+    - [**ABSTRACT FACTORY**](#fabricas)
+    - [**PRODUCTOS**](#productos)
+    - [**RECURSOS**](#recursos)
+    - [**GAME**](#main)
+
+### **EXPLICACIÓN CÓDIGO ZOMBIE**
+
+#### **CONSTRUCTORES**
+
+En esta clase encontramos la clase constructor, una clase abstracta que construye el personaje y una clase de un producto específico conocida como Constructor Zombis.
+
+```python
+
+class Constructor():
+    def get_sprites(self):
+        pass
+
+
+class ConstructorZombis():
+    def __init__(self):
+        self.fabrica = FabricaZombis()
+
+    def get_sprites(self):
+        return [self.fabrica.crear_derecha(),
+                self.fabrica.crear_izquierda()]
+
+```
+
+Se encuentra en este programa la clase Director, cuya función se asimila a la descrita anteriormente. En este fragmento de código se ha llamado al personaje como Heroe.
+
+```python
+
+class Director():
+
+    def setBuilder(self, builder):
+        self.__builder = builder
+
+    def getHeroe(self):
+        jugador = Personaje()
+        jugador.set_sprites(self.__builder.get_sprites())
+        return jugador
+
+```
+
+#### **PLAYER**
+
+En la clase Personaje se establecen los movimientos del personaje, y se obtinene las imagenes.
+
+```python
+class Personaje(Sprite):
+    def __init__(self):
+        Sprite.__init__(self)
+        self.cont = 0
+        self.state = 0
+
+    def set_sprites(self, sprites):
+        self.sprites = sprites
+        self.image = self.sprites[self.state][self.cont]
+        self.rect = self.image.get_rect()
+        self.rect.move_ip(50, 50)
+
+    def CDerecha(self):
+        self.state = 0
+        self.rect.x += 5
+        self.image = self.animar_state(self.sprites[self.state])
+
+    def CIzquierda(self):
+        self.state = 1
+        self.rect.x -= 5
+        self.image = self.animar_state(self.sprites[self.state])
+```
+
+Con la funcion de la siguiente clase se gráfica el muñeco en la ventana.
+
+```python
+def dibujar(self, ventana):
+    ventana.blit(self.image, self.rect)
+
+def animar_state(self, state):
+    self.cont += 1
+    if self.cont > (len(state) - 1):
+        self.cont = 0
+    return state[self.cont]
+```
+
+#### **FABRICAS**
+
+En este archivo se encuentra la fabrica Abstracta de un personaje, en la cual se definen las funciones que ejecutara el personaje, este programa venía con las funciones Derecha e Izquierda, como los personajes de nuestro programa realizan otros movimientos, recurrimos a la clase [Adapter](#adapter), para realizar su adaptación.
+
+```python
+class FabricaAbstracta():
+    def crear_derecha(self): pass
+    def crear_izquierda(self): pass
+
+
+class FabricaZombis(FabricaAbstracta):
+    def crear_izquierda(self):
+        izquierda = IzquierdaZombi()
+        return izquierda.get_sprites()
+
+    def crear_derecha(self):
+        derecha = DerechaZombi()
+        return derecha.get_sprites()
+```
+
+#### **PRODUCTOS**
+
+En esta clase se cargan las imágenes a sus correspondientes acciones.
+Tanto para un personaje en general (Clase abstracta como Derecha e Izquierda), como a un personaje en específico (Derecha e Izquierda Zombi)
+
+```python
+
+class Derecha():
+    def get_sprites(self):
+        pass
+
+
+class DerechaZombi(Derecha):
+    def get_sprites(self):
+        return [pygame.image.load('Personaje_master\Img\spritesZ\ZCD1.png'),
+                pygame.image.load('Personaje_master\Img\spritesZ\ZCD2.png'),
+                pygame.image.load('Personaje_master\Img\spritesZ\ZCD3.png'),
+                pygame.image.load('Personaje_master\Img\spritesZ\ZCD4.png'),
+                pygame.image.load('Personaje_master\Img\spritesZ\ZCD5.png'),
+                pygame.image.load('Personaje_master\Img\spritesZ\ZCD6.png'),
+                pygame.image.load('Personaje_master\Img\spritesZ\ZCD7.png'),
+                pygame.image.load('Personaje_master\Img\spritesZ\ZCD8.png')]
+
+
+class Izquierda():
+    def get_sprites(self):
+        pass
+
+
+class IzquierdaZombi(Izquierda):
+    def get_sprites(self):
+        return [pygame.image.load('Personaje_master\Img\spritesZ\ZCI1.png'),
+                pygame.image.load('Personaje_master\Img\spritesZ\ZCI2.png'),
+                pygame.image.load('Personaje_master\Img\spritesZ\ZCI3.png'),
+                pygame.image.load('Personaje_master\Img\spritesZ\ZCI4.png'),
+                pygame.image.load('Personaje_master\Img\spritesZ\ZCI5.png'),
+                pygame.image.load('Personaje_master\Img\spritesZ\ZCI6.png'),
+                pygame.image.load('Personaje_master\Img\spritesZ\ZCI7.png'),
+                pygame.image.load('Personaje_master\Img\spritesZ\ZCI8.png')]
+
+```
+
+#### **RECURSOS**
+
+Esta clase fue creada con el propósito de darle diseño al programa, tiene parte de la estética, como el cursor y el diseño del botón.
+Como este fragmento de código fue realizado para ejecutar solo los movimientos de un Zombi, y esta fue adaptado a nuestro programa, esta clase NO se encuentra implementada en nuestro programa final.
+
+```python
+import pygame
+import random
+from pygame.locals import *
+
+class Cursor(pygame.Rect):
+   def __init__(self):
+       pygame.Rect.__init__(self,0,0,1,1)
+
+   def actualizar(self):
+       self.left,self.top=pygame.mouse.get_pos()
+
+class Boton(pygame.sprite.Sprite):
+   def __init__(self,img,x,y):
+       self.img = img
+       self.x = x
+       self.y = y
+       self.rect = self.img.get_rect()
+       self.rect.left,self.rect.top=(x,y)
+
+   def actualizar(self,pantalla):
+       pantalla.blit(self.img,self.rect)
+```
+
+#### **MAIN**
+
+En esta clase se ejecuta el programa, se muestra la ventana, se le establece el tamaño y se cargan los sprites y los recursos. Como este fragmento de código fue realizado para ejecutar solo los movimientos de un Zombi, y esta fue adaptado a nuestro programa, esta clase NO se encuentra implementada en nuestro programa final.
+
+```python
+
+class main():
+    pygame.init()
+    ventana = pygame.display.set_mode((1000, 600))
+    pygame.display.set_caption("Ventana Principal")
+    clock = pygame.time.Clock()
+    cursor1 = recursos.Cursor()
+    imgFondo = pygame.image.load("Personaje-master\Img\FondoP.png").convert()
+    img1 = pygame.image.load("Personaje-master\Img\spritesZ\ZCD2.png")
+    botonZ = recursos.Boton(img1, 158, 450)
+
+    jugando = False
+    ejecutando = True
+
+    director = Director()
+
+    while ejecutando == True:
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if cursor1.colliderect(botonZ.rect):
+                    director.setBuilder(ConstructorZombis())
+                    jugando = True
+                    player = director.getHeroe()
+            if event.type == pygame.QUIT:
+                ejecutando = False
+
+        if jugando:
+            pygame.mouse.set_visible(False)
+            ventana.blit(imgFondo, [0, 0])
+            player.dibujar(ventana)
+            if event.type == pygame.KEYDOWN:
+                if event.key == K_LEFT:
+                    player.CIzquierda()
+                if event.key == K_RIGHT:
+                    player.CDerecha()
+            clock.tick(25)
+
+        else:
+            ventana.blit(imgFondo, [0, 0])
+            cursor1.actualizar()
+            botonZ.actualizar(ventana)
+        pygame.display.flip()
+    pygame.quit()
+
+
+if __name__ == "__main__":
+    main()
+
 ```
 
 ---
